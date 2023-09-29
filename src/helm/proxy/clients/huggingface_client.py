@@ -1,3 +1,8 @@
+from transformers import AutoConfig, AutoModel
+from open_lm.utils.transformers.model import OpenLMModel
+from open_lm.utils.transformers.model import OpenLMforCausalLM
+from open_lm.utils.transformers.config import OpenLMConfig
+
 from copy import deepcopy
 import torch
 from dataclasses import asdict
@@ -24,6 +29,10 @@ from helm.proxy.clients.huggingface_model_registry import (
 )
 from threading import Lock
 
+
+AutoConfig.register("openlm", OpenLMConfig)
+# AutoModel.register(OpenLMConfig, OpenLMModel)
+AutoModelForCausalLM.register(OpenLMConfig, OpenLMforCausalLM)
 
 # Map of HELM model name to Hugging Face Hub model name where they differ.
 _KNOWN_MODEL_ALIASES: Dict[str, str] = {
