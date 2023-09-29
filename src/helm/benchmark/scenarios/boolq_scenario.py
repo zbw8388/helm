@@ -101,6 +101,14 @@ class BoolQScenario(Scenario):
         self.only_contrast = only_contrast
 
     def get_split_instances(self, split: str, path: str, contrast_map: dict) -> List[Instance]:
+        def flip_answer(answer: str) -> str:
+            if answer == "Yes":
+                return "No"
+            elif answer == "No":
+                return "Yes"
+            else:
+                raise ValueError(f"Unexpected answer: {answer}")
+
         split_instances: List[Instance] = []
         with open(path, "r") as f:
             all_triplets = list(f)
@@ -121,7 +129,7 @@ class BoolQScenario(Scenario):
                         self.get_context(passage, q) for q in contrast_map[question]["perturbed_questions"]
                     ]
                     contrast_references = [
-                        [Reference(Output(text=perturbed_answer), tags=[CORRECT_TAG])]
+                        [Reference(Output(text=perturbed_answer), tags=[CORRECT_TAG]), Reference(Output(text=flip_answer(perturbed_answer)), tags=[])]
                         for perturbed_answer in contrast_map[question]["perturbed_answers"]
                     ]
                 elif self.only_contrast and split == VALID_SPLIT:
@@ -129,7 +137,7 @@ class BoolQScenario(Scenario):
 
                 instance: Instance = Instance(
                     input=input,
-                    references=[Reference(Output(text=correct_answer), tags=[CORRECT_TAG])],
+                    references=[Reference(Output(text=correct_answer), tags=[CORRECT_TAG]), Reference(Output(text=flip_answer(correct_answer)), tags=[])],
                     split=split,
                     contrast_inputs=contrast_inputs,
                     contrast_references=contrast_references,
