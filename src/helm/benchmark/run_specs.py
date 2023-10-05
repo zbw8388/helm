@@ -1109,12 +1109,18 @@ def get_math_spec(
 
 
 @run_spec_function("boolq")
-def get_boolq_spec(only_contrast=False) -> RunSpec:
+def get_boolq_spec(only_contrast=False, method = ADAPT_MULTIPLE_CHOICE_SEPARATE_ORIGINAL) -> RunSpec:
     scenario_spec = ScenarioSpec(
         class_name="helm.benchmark.scenarios.boolq_scenario.BoolQScenario", args={"only_contrast": only_contrast}
     )
 
     adapter_spec = get_generation_adapter_spec(input_noun="Passage", output_noun="Answer")
+    adapter_spec = get_multiple_choice_adapter_spec(
+        instructions="",
+        method=method,
+        input_noun="Passage",
+        output_noun="Answer",
+    )
 
     return RunSpec(
         name="boolq" + (":only_contrast=True" if only_contrast else ""),
